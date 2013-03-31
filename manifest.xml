@@ -1,0 +1,17 @@
+<package>
+  <description brief="coordinatorISL">
+
+     coordinatorISL
+
+  </description>
+  <author>Irobot1</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/coordinatorISL</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="navigationISL"/>
+
+</package>
+
+
