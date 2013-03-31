@@ -11,6 +11,22 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 rosbuild_init()
 
+FIND_PACKAGE(Qt4 REQUIRED)
+
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+SET(coordinatorISL_HEADERS src/rosThread.h)
+
+SET(coordinatorISL_SOURCES src/rosThread.cpp)
+
+QT4_WRAP_CPP(coordinatorISL_HEADERS_MOC ${coordinatorISL_HEADERS})
+
+qt4_automoc(${coordinatorISL_SOURCES})
+
+include_directories(./src/)
+
+
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
@@ -21,10 +37,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
+rosbuild_add_library(${PROJECT_NAME} src/main.cpp)
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} qjson)
+
+
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+rosbuild_add_executable(coordinator src/main.cpp src/coordinator.cpp src/coordinator.h ${coordinatorISL_SOURCES} ${coordinatorISL_HEADERS_MOC})
+target_link_libraries(coordinator ${PROJECT_NAME})
