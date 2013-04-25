@@ -1,40 +1,16 @@
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Twist.h>
-#include <nav_msgs/Odometry.h>
-#include "navigationController.h"
-#include "navigationISL/robotInfo.h"
-#include "navigationISL/neighborInfo.h"
+#include "coordinator.h"
+#include <navigationISL/neighborInfo.h>
+#include <navigationISL/robotInfo.h>
 #include <QTimer>
 #include <QVector>
 #include <QThread>
 #include <QObject>
 
 
-#define numOfRobots 5
+//#define numOfRobots 5
 
-class Robot
-{
-public:
-    int robotID;
-    bool isCoordinator;
-    double radius;
-    double targetX;
-    double targetY;
-
-};
-class Obstacle
-{
-public:
-    int id;
-    double radius;
-    double x;
-    double y;
-
-
-};
 
 class RosThread:public QObject
 {
@@ -44,15 +20,8 @@ public:
 
     RosThread();
 
-    Robot robot;
 
-    QVector<Obstacle> obstacles;
-
-   // RosThread(int argc, char **argv, std::string nodeName);
-
-public:
-
-     bool readConfigFile(QString filename);
+    Coordinator coordinator;
 
 private:
      bool shutdown;
@@ -61,66 +30,19 @@ private:
 
      ros::NodeHandle n;
 
-     ros::Subscriber amclSub;
+     ros::Subscriber communicationManagerSubscriber;
 
-     ros::Subscriber neighborInfoSubscriber;
+     ros::Publisher networkinfoPublisher;
 
-     ros::Subscriber turtlebotOdometrySubscriber;
+     void handleCoordinatorUpdate(navigationISL::neighborInfo info);
 
-     ros::Publisher robotinfoPublisher;
+     bool readInitialPoses(QString filepath);
 
-     ros::Publisher coordinatorUpdatePublisher;
-
-     ros::Publisher turtlebotVelPublisher;
-
-     ros::Publisher amclInitialPosePublisher;
-
-     void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
-
-     void turtlebotOdometryCallback(const nav_msgs::Odometry & msg);
-
-     void neighborInfoCallback(navigationISL::neighborInfo neighborInfo);
-
-     void poseUpdate(const ros::TimerEvent&);
-
-     void coordinatorUpdate(const ros::TimerEvent&);
-
-     void robotContoller(double [], int , double [][4], double [][3], double [][4], double, double []);
-
-     void calculateTurn(double desired, double current);
-
-     void sendVelocityCommand();
-    // int numOfRobots;
-
-     double vel[2]; // velocity vector
      double bin[numOfRobots+1][4];// positions including itself
-     double bt[numOfRobots+1][3]; // goal positions
-     double rr[numOfRobots+1]; // radii of the robots
-     double b_rs[numOfRobots+1][4]; // robots' positions within sensing range
-     double ro;
-     double kkLimits[2]; // upper and lower bounds of parameters in navigation function
-     double bp[5][4];
 
-     int poseUpdatePeriod;
-     int coordinatorUpdatePeriod;
+     int adjM[numOfRobots+1][numOfRobots+1];
 
-     // The robot's angle threshold while rotating in degrees
-     int angleThreshold;
-
-     // The robot's distance threshold for goal achievement in cms
-     int distanceThreshold;
-
-     // in m/sec linear velocity
-     double linearVelocity;
-
-     // in rad/sec rotational velocity
-     double angularVelocity;
-
-     int numrobots;
-
-     int partDist;
-
-     geometry_msgs::Twist velocityVector;
+     bool dataReceived[numOfRobots+1];
 
 public slots:
      void work();
