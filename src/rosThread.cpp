@@ -76,8 +76,18 @@ void RosThread::work(){
         ros::spinOnce();
         loop.sleep();
 
+        int activeRobots = 0;
+        for(int i = 1; i <=numOfRobots; i++)
+        {
+            if (dataReceived[i]==true)
+            {
+                activeRobots = activeRobots + 1;
+            }
+        }
+
         // If all the data is received from the robots
-        if(dataReceived[1] && dataReceived[2] && dataReceived[3])
+        //if(dataReceived[1] && dataReceived[2] && dataReceived[3])
+        if(activeRobots == numOfRobots)
         {
 
             // Play Game

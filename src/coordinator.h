@@ -7,7 +7,7 @@
 #include <math.h>
 #include <QString>
 
-#define numOfRobots 3
+#define numOfRobots 5
 
 #define NR_END 1
 #define FREE_ARG char*
